@@ -53,6 +53,7 @@ async def trans(content_list):
         content.append(index)
     contents = ' '.join(content)
 
+    #whether ues weblio or google
     if len(content) == 1 and isenword(contents) == True and tolang == 'ja':
         url = weblio + contents
         data = await fetch(session, url)
