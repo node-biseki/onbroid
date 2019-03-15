@@ -24,7 +24,7 @@ lang = {
 
 alphanum = re.compile(r'^[a-zA-Z0-9]+$')
 def isenword(word):
-    return alphanum.match(word) is not None
+    return bool(alphanum.match(word))
 
 #scraping
 async def fetch(session, url):
@@ -54,14 +54,14 @@ async def trans(content_list):
     contents = ' '.join(content)
 
     #whether ues weblio or google
-    if len(content) == 1 and isenword(contents) == True and tolang == 'ja':
+    if len(content) == 1 and isenword(contents) and tolang == 'ja':
         url = weblio + contents
         data = await fetch(session, url)
         translate, level = data[0], data[1]
 
         if translate == '1087万語収録！weblio辞書で英語学習':
             translate = '{}って何？'.format(contents)
-        if level == '':
+        if not level:
             level = 'noob level'
     else:
         translate = t.translate(contents, dest=tolang).text
@@ -74,10 +74,10 @@ async def trans(content_list):
 @client.event
 async def on_message(message):
     try:
-        if message.content[0] == '*':
+        if message.content.startswith('*'):
             content_list = message.content[1:].split()
             reply = await trans(content_list)
-            await message.channel.send('', embed=reply)
+            await message.channel.send(embed=reply)
     except:
         pass
 
